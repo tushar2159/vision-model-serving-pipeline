@@ -1,6 +1,6 @@
 # Vision Model Serving Pipeline
 
-Unified FastAPI-style inference architecture for classification, segmentation, and detection models with validation, model registry metadata, tests, and CI.
+Containerized FastAPI inference architecture for classification, segmentation, and detection routing with request validation, health/readiness contracts, tests, and CI.
 
 **Portfolio intent:** demonstrate clean AI engineering architecture without publishing client data, employer code, private model weights, commercial AOIs, or proprietary production metrics.
 
@@ -36,6 +36,8 @@ evaluate   predict
 ├── src/vision_serving/
 ├── tests/
 ├── tools/
+├── Dockerfile
+├── .dockerignore
 ├── ENGINEERING_PROCESS.md
 ├── EXPERIMENTS.md
 └── pyproject.toml
@@ -52,11 +54,18 @@ pip install -e .[dev]
 ## Runbook
 
 ```bash
-vision-serving prepare
-vision-serving train
-vision-serving evaluate
-vision-serving predict
 vision-serving self-check
+uvicorn vision_serving.api:app --host 0.0.0.0 --port 8000
+```
+
+The OpenAPI interface is available at `http://localhost:8000/docs`.
+
+## Container
+
+```bash
+docker build -t vision-model-serving .
+docker run --rm -p 8000:8000 vision-model-serving
+curl http://localhost:8000/ready
 ```
 
 ## Engineering principles demonstrated
@@ -70,6 +79,8 @@ vision-serving self-check
 - release manifest / model-registry pattern
 - reproducible promoted tools
 - no large binaries or datasets committed
+- non-root container runtime and container health check
+- API integration tests and request-size validation
 - no unverified production-accuracy claims
 
 ## Public-data policy
